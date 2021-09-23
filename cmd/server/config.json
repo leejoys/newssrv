@@ -1,0 +1,19 @@
+{
+    "rss":[
+       "https://habr.com/ru/rss/hub/go/all/?fl=ru",
+       "https://habr.com/ru/rss/best/daily/?fl=ru",
+       "https://golangcode.com/index.xml",
+       "https://forum.golangbridge.org/latest.rss",
+       "https://appliedgo.net/index.xml",
+       "https://blog.jetbrains.com/go/feed/",
+       "https://dave.cheney.net/category/golang/feed",
+       "https://changelog.com/gotime/feed",
+       "https://qvault.io/feed/",
+       "https://golang.ch/feed/",
+       "https://mariadesouza.com/category/golang/feed/",
+       "http://sdet.us/category/golang/feed/",
+       "https://trinhhieu668.wordpress.com/category/big-data/golang/feed/",
+       "https://gosamples.dev/index.xml"
+    ],
+    "request_period": 5
+ }
