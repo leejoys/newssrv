@@ -52,12 +52,15 @@ func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	postsWithIDs := []storage.Post{}
-	for i, post := range posts {
-		post.ID = i + 1
-		postsWithIDs = append(postsWithIDs, post)
-	}
-	bytes, err := json.Marshal(postsWithIDs)
+
+	//uncomment for mongo
+	// postsWithIDs := []storage.Post{}
+	// for i, post := range posts {
+	// 	post.ID = i + 1
+	// 	postsWithIDs = append(postsWithIDs, post)
+	// }
+
+	bytes, err := json.Marshal(posts)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

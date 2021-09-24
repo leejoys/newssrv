@@ -71,6 +71,43 @@ func (s *Store) Posts() ([]storage.Post, error) {
 	return posts, rows.Err()
 }
 
+//PostsN - получение N публикаций
+func (s *Store) PostsN(n int) ([]storage.Post, error) {
+	rows, err := s.db.Query(context.Background(),
+		`SELECT 
+	posts.id, 
+	posts.title, 
+	posts.content, 
+	posts.author_id,
+	posts.pubdate, 
+	posts.pubtime,
+	posts.link
+	FROM posts;`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []storage.Post
+	for rows.Next() {
+		var p storage.Post
+		err = rows.Scan(
+			&p.ID,
+			&p.Title,
+			&p.Content,
+			&p.PubDate,
+			&p.PubTime,
+			&p.Link,
+		)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, rows.Err()
+}
+
 //AddPost - создание новой публикации
 func (s *Store) AddPost(p storage.Post) error {
 	_, err := s.db.Exec(context.Background(), `
