@@ -2,10 +2,36 @@ package pgdb
 
 import (
 	"context"
+	"errors"
 	"newssrv/pkg/storage"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
+
+var ErrorDuplicatePost error = errors.New("SQLSTATE 23505")
+
+// IsDuplicateKeyError returns true if err is a duplicate key error
+// func IsDuplicateKeyError(err error) bool {
+// 	// handles SERVER-7164 and SERVER-11493
+// 	for ; err != nil; err = Unwrap(err) {
+// 		if e, ok := err.(ServerError); ok {
+// 			return e.HasErrorCode(11000) || e.HasErrorCode(11001) || e.HasErrorCode(12582) ||
+// 				e.HasErrorCodeWithMessage(16460, " E11000 ")
+// 		}
+// 	}
+// 	return false
+// }
+
+// Unwrap returns the inner error if err implements Unwrap(), otherwise it returns nil.
+func Unwrap(err error) error {
+	u, ok := err.(interface {
+		Unwrap() error
+	})
+	if !ok {
+		return nil
+	}
+	return u.Unwrap()
+}
 
 // Хранилище данных.
 type Store struct {

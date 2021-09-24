@@ -100,6 +100,7 @@ func (s *server) logger() {
 			log.Println(err)
 			continue
 		}
-		log.Fatalln(err)
+
+		log.Fatalln(pgdb.Unwrap(err))
 	}
 }
