@@ -9,7 +9,6 @@ import (
 	"newssrv/pkg/datasource"
 	"newssrv/pkg/datasource/rss"
 	"newssrv/pkg/storage"
-	"newssrv/pkg/storage/mongodb"
 	"newssrv/pkg/storage/pgdb"
 	"os"
 	"time"
@@ -96,11 +95,10 @@ func (s *server) poster() {
 //обрабатывает ответы из каналов с ошибками
 func (s *server) logger() {
 	for err := range s.ds.ErrorChan {
-		if err == mongodb.ErrorDuplicatePost {
+		if err == pgdb.ErrorDuplicatePost {
 			log.Println(err)
 			continue
 		}
-
-		log.Fatalln(pgdb.Unwrap(err))
+		log.Fatalln(err)
 	}
 }
