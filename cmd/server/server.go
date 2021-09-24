@@ -74,7 +74,7 @@ func main() {
 
 	// Запускаем веб-сервер на порту 8081 на всех интерфейсах.
 	// Предаём серверу маршрутизатор запросов.
-	log.Fatal(http.ListenAndServe(":8081", srv.api.Router()))
+	log.Fatal(http.ListenAndServe(":8080", srv.api.Router()))
 }
 
 //обрабатывает ответы из каналов с постами

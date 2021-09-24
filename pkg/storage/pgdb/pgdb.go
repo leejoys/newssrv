@@ -41,7 +41,6 @@ func (s *Store) Posts() ([]storage.Post, error) {
 	posts.id, 
 	posts.title, 
 	posts.content, 
-	posts.author_id,
 	posts.pubdate, 
 	posts.pubtime,
 	posts.link
@@ -78,7 +77,6 @@ func (s *Store) PostsN(n int) ([]storage.Post, error) {
 	posts.id, 
 	posts.title, 
 	posts.content, 
-	posts.author_id,
 	posts.pubdate, 
 	posts.pubtime,
 	posts.link
@@ -130,8 +128,18 @@ func (s *Store) AddPost(p storage.Post) error {
 func (s *Store) UpdatePost(p storage.Post) error {
 	_, err := s.db.Exec(context.Background(), `
 	UPDATE posts 
-	SET title=$2, content=$3, pubdate=$4, pubtime=$5, link=$6
-	WHERE id=$1;`, p.ID, p.Title, p.Content, p.PubDate, p.PubTime, p.Link)
+	SET title=$2,
+	content=$3,
+	pubdate=$4,
+	pubtime=$5,
+	link=$6
+	WHERE id=$1;`,
+		p.ID,
+		p.Title,
+		p.Content,
+		p.PubDate,
+		p.PubTime,
+		p.Link)
 	return err
 }
 
