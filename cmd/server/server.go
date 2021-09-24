@@ -10,6 +10,7 @@ import (
 	"newssrv/pkg/datasource/rss"
 	"newssrv/pkg/storage"
 	"newssrv/pkg/storage/mongodb"
+	"newssrv/pkg/storage/pgdb"
 	"os"
 	"time"
 )
@@ -41,13 +42,21 @@ func main() {
 	srv.ds.Parser = p
 
 	// Создаём объект базы данных MongoDB.
-	pwd := os.Getenv("Cloud0pass")
-	connstr := fmt.Sprintf(
-		"mongodb+srv://sup:%s@cloud0.wspoq.mongodb.net/newssrv?retryWrites=true&w=majority",
-		pwd)
-	db, err := mongodb.New("newssrv", connstr)
+	// pwd := os.Getenv("Cloud0pass")
+	// connstr := fmt.Sprintf(
+	// 	"mongodb+srv://sup:%s@cloud0.wspoq.mongodb.net/newssrv?retryWrites=true&w=majority",
+	// 	pwd)
+	// db, err := mongodb.New("newssrv", connstr)
+	// if err != nil {
+	// 	log.Fatalf("mongo.New error: %s", err)
+	// }
+
+	//  Создаём объект базы данных PostgreSQL.
+	pwd := os.Getenv("pgpass")
+	connstr := "postgres://postgres:" + pwd + "@0.0.0.0/catalog3"
+	db, err := pgdb.New(connstr)
 	if err != nil {
-		log.Fatalf("mongo.New error: %s", err)
+		log.Fatal(err)
 	}
 
 	// Инициализируем хранилище сервера БД

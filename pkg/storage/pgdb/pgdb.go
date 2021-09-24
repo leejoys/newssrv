@@ -3,7 +3,6 @@ package pgdb
 import (
 	"context"
 	"newssrv/pkg/storage"
-	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -43,12 +42,10 @@ func (s *Store) Posts() ([]storage.Post, error) {
 	posts.title, 
 	posts.content, 
 	posts.author_id,
-	authors.name, 
-	posts.created_at, 
-	posts.published_at
-	FROM posts
-	JOIN authors
-	ON authors.id=posts.author_id;`)
+	posts.pubdate, 
+	posts.pubtime,
+	posts.link
+	FROM posts;`)
 
 	if err != nil {
 		return nil, err
@@ -77,18 +74,27 @@ func (s *Store) Posts() ([]storage.Post, error) {
 //AddPost - создание новой публикации
 func (s *Store) AddPost(p storage.Post) error {
 	_, err := s.db.Exec(context.Background(), `
-	INSERT INTO posts (title, content, author_id, created_at, published_at) 
-	VALUES ($1,$2,$3,$4,$5);`, p.Title, p.Content,
-		p.AuthorID, time.Now().Unix(), time.Now().Unix())
+	INSERT INTO posts (
+		title, 
+		content, 
+		pubdate, 
+		pubtime,
+		link) 
+	VALUES ($1,$2,$3,$4,$5);`,
+		p.Title,
+		p.Content,
+		p.PubDate,
+		p.PubTime,
+		p.Link)
 	return err
 }
 
-//UpdatePost - обновление по id значения title, content, author_id и published_at
+//UpdatePost - обновление по id значения title,  pubdate, pubtime, и link
 func (s *Store) UpdatePost(p storage.Post) error {
 	_, err := s.db.Exec(context.Background(), `
 	UPDATE posts 
-	SET title=$2, content=$3, author_id=$4, published_at=$5
-	WHERE id=$1;`, p.ID, p.Title, p.Content, p.AuthorID, p.PublishedAt)
+	SET title=$2, content=$3, pubdate=$4, pubtime=$5, link=$6
+	WHERE id=$1;`, p.ID, p.Title, p.Content, p.PubDate, p.PubTime, p.Link)
 	return err
 }
 
