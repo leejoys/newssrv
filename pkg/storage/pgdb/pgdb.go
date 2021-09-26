@@ -5,8 +5,8 @@ import (
 	"errors"
 	"newssrv/pkg/storage"
 
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
-	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -126,8 +126,15 @@ func (s *Store) AddPost(p storage.Post) error {
 		p.PubDate,
 		p.PubTime,
 		p.Link)
-	if errCheck, ok := err.(pgx.PgError); ok && errCheck.Code == pgerrcode.UniqueViolation {
-		return ErrorDuplicatePost
+
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case pgerrcode.UniqueViolation:
+				err = ErrorDuplicatePost
+			}
+		}
 	}
 	return err
 }

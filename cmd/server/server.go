@@ -96,7 +96,6 @@ func (s *server) poster() {
 func (s *server) logger() {
 	for err := range s.ds.ErrorChan {
 		if err == pgdb.ErrorDuplicatePost {
-			log.Println(err)
 			continue
 		}
 		log.Fatalln(err)
