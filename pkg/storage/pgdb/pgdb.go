@@ -85,7 +85,8 @@ func (s *Store) PostsN(n int) ([]storage.Post, error) {
 	posts.pubdate, 
 	posts.pubtime,
 	posts.link
-	FROM posts;`)
+	FROM posts
+	LIMIT $1;`, n)
 
 	if err != nil {
 		return nil, err
