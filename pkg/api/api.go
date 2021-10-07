@@ -28,10 +28,11 @@ func New(db storage.Interface) *API {
 
 // Регистрация обработчиков API.
 func (api *API) endpoints() {
-	// получить n последних новостей
+	// получить страницу page последних новостей при количестве quantity на страницу
 	api.r.HandleFunc("/news/{page}/{quantity}", api.posts).Methods(http.MethodGet)
-	// веб-приложение
-	api.r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./webapp"))))
+	// получить страницу page последних новостей при количестве quantity на страницу
+	// содержащих keyword в заголовке
+	api.r.HandleFunc("/filter/{page}/{quantity}/{keyword}", api.filter).Methods(http.MethodGet)
 }
 
 // Получение маршрутизатора запросов.
@@ -73,6 +74,42 @@ func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 	// 	post.ID = i + 1
 	// 	postsWithIDs = append(postsWithIDs, post)
 	// }
+
+	bytes, err := json.Marshal(res)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(bytes)
+}
+
+// Получение публикаций по ключевому слову.
+func (api *API) filter(w http.ResponseWriter, r *http.Request) {
+
+	ns := mux.Vars(r)["page"]
+	n, err := strconv.Atoi(ns)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	qs := mux.Vars(r)["quantity"]
+	q, err := strconv.Atoi(qs)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	key := mux.Vars(r)["keyword"]
+
+	type result struct {
+		Count int
+		Posts []storage.Post
+	}
+	res := result{}
+	res.Posts, res.Count, err = api.db.Filter(n, q, key)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Filter error: %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
 
 	bytes, err := json.Marshal(res)
 	if err != nil {

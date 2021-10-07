@@ -75,7 +75,8 @@ func (s *Store) Posts() ([]storage.Post, error) {
 	return posts, rows.Err()
 }
 
-//PostsN - получение n-ной страницы публикаций
+//фильтр SELECT * FROM Universities WHERE UniversityName LIKE '%State%'
+//PostsN - получение n-ной страницы публикаций при q публикаций на страницу
 func (s *Store) PostsN(n, q int) ([]storage.Post, int, error) {
 	count := 0
 	err := s.db.QueryRow(context.Background(),
@@ -96,6 +97,54 @@ func (s *Store) PostsN(n, q int) ([]storage.Post, int, error) {
 	FROM posts
 	OFFSET $1
 	LIMIT $2;`, o, q)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var posts []storage.Post
+	for rows.Next() {
+		var p storage.Post
+		err = rows.Scan(
+			&p.ID,
+			&p.Title,
+			&p.Content,
+			&p.PubDate,
+			&p.PubTime,
+			&p.Link,
+		)
+		if err != nil {
+			return nil, 0, err
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, count, rows.Err()
+}
+
+//фильтр SELECT * FROM Universities WHERE UniversityName LIKE '%State%'
+//Filter - получение n-ной страницы публикаций с ключевым словом key при q публикаций на страницу
+func (s *Store) Filter(n, q int, key string) ([]storage.Post, int, error) {
+	count := 0
+	err := s.db.QueryRow(context.Background(),
+		`SELECT count(*) FROM posts WHERE title LIKE '_$1_';`, key).Scan(&count)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	o := n * q
+	rows, err := s.db.Query(context.Background(),
+		`SELECT 
+	posts.id, 
+	posts.title, 
+	posts.content, 
+	posts.pubdate, 
+	posts.pubtime,
+	posts.link
+	FROM posts
+	WHERE title LIKE '_$3_'
+	OFFSET $1
+	LIMIT $2;`, o, q, key)
 
 	if err != nil {
 		return nil, 0, err
