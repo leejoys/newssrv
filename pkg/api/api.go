@@ -28,7 +28,7 @@ func New(db storage.Interface) *API {
 // Регистрация обработчиков API.
 func (api *API) endpoints() {
 	// получить n последних новостей
-	api.r.HandleFunc("/news/{n}", api.posts).Methods(http.MethodGet)
+	api.r.HandleFunc("/news/{page}/{quantity}", api.posts).Methods(http.MethodGet)
 	// веб-приложение
 	api.r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./webapp"))))
 }
@@ -41,13 +41,19 @@ func (api *API) Router() *mux.Router {
 
 // Получение всех публикаций.
 func (api *API) posts(w http.ResponseWriter, r *http.Request) {
-	ns := mux.Vars(r)["n"]
+	ns := mux.Vars(r)["page"]
 	n, err := strconv.Atoi(ns)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	posts, err := api.db.PostsN(n)
+	qs := mux.Vars(r)["quantity"]
+	q, err := strconv.Atoi(qs)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	posts, err := api.db.PostsN(n, q)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

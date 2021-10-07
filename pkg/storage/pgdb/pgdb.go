@@ -75,8 +75,8 @@ func (s *Store) Posts() ([]storage.Post, error) {
 	return posts, rows.Err()
 }
 
-//PostsN - получение N публикаций
-func (s *Store) PostsN(n int) ([]storage.Post, error) {
+//PostsN - получение n-ной страницы публикаций
+func (s *Store) PostsN(n, q int) ([]storage.Post, error) {
 	rows, err := s.db.Query(context.Background(),
 		`SELECT 
 	posts.id, 
@@ -86,7 +86,8 @@ func (s *Store) PostsN(n int) ([]storage.Post, error) {
 	posts.pubtime,
 	posts.link
 	FROM posts
-	LIMIT $1;`, n)
+	OFFSET $1
+	LIMIT $2;`, n, q)
 
 	if err != nil {
 		return nil, err
