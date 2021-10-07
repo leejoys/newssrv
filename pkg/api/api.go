@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"newssrv/pkg/storage"
 	"strconv"
@@ -39,7 +40,7 @@ func (api *API) Router() *mux.Router {
 	return api.r
 }
 
-// Получение всех публикаций.
+// Получение публикаций.
 func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 
 	ns := mux.Vars(r)["page"]
@@ -62,7 +63,7 @@ func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 	res := result{}
 	res.Posts, res.Count, err = api.db.PostsN(n, q)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("PostsN error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 

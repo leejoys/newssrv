@@ -79,7 +79,7 @@ func (s *Store) Posts() ([]storage.Post, error) {
 func (s *Store) PostsN(n, q int) ([]storage.Post, int, error) {
 	count := 0
 	err := s.db.QueryRow(context.Background(),
-		`SELECT count(*) FROM posts;`).Scan(count)
+		`SELECT count(*) FROM posts;`).Scan(&count)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -149,6 +149,7 @@ func (s *Store) AddPost(p storage.Post) error {
 	return err
 }
 
+//TODO ErrorDuplicatePost
 //UpdatePost - обновление по id значения title,  pubdate, pubtime, и link
 func (s *Store) UpdatePost(p storage.Post) error {
 	_, err := s.db.Exec(context.Background(), `
