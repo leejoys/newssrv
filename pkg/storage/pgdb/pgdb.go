@@ -77,6 +77,7 @@ func (s *Store) Posts() ([]storage.Post, error) {
 
 //PostsN - получение n-ной страницы публикаций
 func (s *Store) PostsN(n, q int) ([]storage.Post, error) {
+	o := n * q
 	rows, err := s.db.Query(context.Background(),
 		`SELECT 
 	posts.id, 
@@ -87,7 +88,7 @@ func (s *Store) PostsN(n, q int) ([]storage.Post, error) {
 	posts.link
 	FROM posts
 	OFFSET $1
-	LIMIT $2;`, n, q)
+	LIMIT $2;`, o, q)
 
 	if err != nil {
 		return nil, err
