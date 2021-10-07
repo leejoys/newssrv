@@ -76,7 +76,14 @@ func (s *Store) Posts() ([]storage.Post, error) {
 }
 
 //PostsN - получение n-ной страницы публикаций
-func (s *Store) PostsN(n, q int) ([]storage.Post, error) {
+func (s *Store) PostsN(n, q int) ([]storage.Post, int, error) {
+	count := 0
+	err := s.db.QueryRow(context.Background(),
+		`SELECT count(*) FROM posts;`).Scan(count)
+	if err != nil {
+		return nil, 0, err
+	}
+
 	o := n * q
 	rows, err := s.db.Query(context.Background(),
 		`SELECT 
@@ -91,7 +98,7 @@ func (s *Store) PostsN(n, q int) ([]storage.Post, error) {
 	LIMIT $2;`, o, q)
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var posts []storage.Post
@@ -106,12 +113,12 @@ func (s *Store) PostsN(n, q int) ([]storage.Post, error) {
 			&p.Link,
 		)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		posts = append(posts, p)
 	}
 
-	return posts, rows.Err()
+	return posts, count, rows.Err()
 }
 
 //AddPost - создание новой публикации

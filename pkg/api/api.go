@@ -41,6 +41,7 @@ func (api *API) Router() *mux.Router {
 
 // Получение всех публикаций.
 func (api *API) posts(w http.ResponseWriter, r *http.Request) {
+
 	ns := mux.Vars(r)["page"]
 	n, err := strconv.Atoi(ns)
 	if err != nil {
@@ -53,7 +54,13 @@ func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	posts, err := api.db.PostsN(n, q)
+
+	type result struct {
+		Count int
+		Posts []storage.Post
+	}
+	res := result{}
+	res.Posts, res.Count, err = api.db.PostsN(n, q)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -66,7 +73,7 @@ func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 	// 	postsWithIDs = append(postsWithIDs, post)
 	// }
 
-	bytes, err := json.Marshal(posts)
+	bytes, err := json.Marshal(res)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
