@@ -127,7 +127,7 @@ func (s *Store) PostsN(n, q int) ([]storage.Post, int, error) {
 func (s *Store) Filter(n, q int, key string) ([]storage.Post, int, error) {
 	count := 0
 	err := s.db.QueryRow(context.Background(),
-		`SELECT count(*) FROM posts WHERE title LIKE '_$1_';`, key).Scan(&count)
+		`SELECT count(*) FROM posts WHERE title ILIKE '%'||$1||'%';`, key).Scan(&count)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -142,7 +142,7 @@ func (s *Store) Filter(n, q int, key string) ([]storage.Post, int, error) {
 	posts.pubtime,
 	posts.link
 	FROM posts
-	WHERE title LIKE '_$3_'
+	WHERE title ILIKE '%'||$3||'%'
 	OFFSET $1
 	LIMIT $2;`, o, q, key)
 
