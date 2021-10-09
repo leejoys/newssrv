@@ -33,6 +33,8 @@ func (api *API) endpoints() {
 	// получить страницу page последних новостей при количестве quantity на страницу
 	// содержащих keyword в заголовке
 	api.r.HandleFunc("/filter/{page}/{quantity}/{keyword}", api.filter).Methods(http.MethodGet)
+	// получить детальную новость n
+	api.r.HandleFunc("/detailed/{n}", api.detailed).Methods(http.MethodGet)
 }
 
 // Получение маршрутизатора запросов.
@@ -67,13 +69,6 @@ func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("PostsN error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
-
-	//uncomment for mongo
-	// postsWithIDs := []storage.Post{}
-	// for i, post := range posts {
-	// 	post.ID = i + 1
-	// 	postsWithIDs = append(postsWithIDs, post)
-	// }
 
 	bytes, err := json.Marshal(res)
 	if err != nil {
@@ -112,6 +107,31 @@ func (api *API) filter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bytes, err := json.Marshal(res)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(bytes)
+}
+
+// Получение одной публикации.
+func (api *API) detailed(w http.ResponseWriter, r *http.Request) {
+
+	ns := mux.Vars(r)["n"]
+	n, err := strconv.Atoi(ns)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	p := storage.Post{}
+	p, err = api.db.Post(n)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Post error: %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+
+	bytes, err := json.Marshal(p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

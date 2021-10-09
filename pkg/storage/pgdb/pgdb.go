@@ -75,6 +75,34 @@ func (s *Store) Posts() ([]storage.Post, error) {
 	return posts, rows.Err()
 }
 
+//Post - получение одной публикации
+func (s *Store) Post(n int) (storage.Post, error) {
+	p := storage.Post{}
+	err := s.db.QueryRow(context.Background(),
+		`SELECT 
+	posts.id, 
+	posts.title, 
+	posts.content, 
+	posts.pubdate, 
+	posts.pubtime,
+	posts.link
+	FROM posts
+	WHERE id=$1;`, n).Scan(
+		&p.ID,
+		&p.Title,
+		&p.Content,
+		&p.PubDate,
+		&p.PubTime,
+		&p.Link,
+	)
+
+	if err != nil {
+		return storage.Post{}, err
+	}
+
+	return p, err
+}
+
 //фильтр SELECT * FROM Universities WHERE UniversityName LIKE '%State%'
 //PostsN - получение n-ной страницы публикаций при q публикаций на страницу
 func (s *Store) PostsN(n, q int) ([]storage.Post, int, error) {
