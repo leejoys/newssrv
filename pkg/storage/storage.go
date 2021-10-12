@@ -13,12 +13,10 @@ type Post struct {
 // Interface задаёт контракт на работу с БД.
 type Interface interface {
 	Post(int) (Post, error)                       //Post - получение одной публикации
-	Posts() ([]Post, error)                       // получение всех публикаций
 	PostsN(int, int) ([]Post, int, error)         // получение n-ной страницы публикаций
 	Filter(int, int, string) ([]Post, int, error) // получение n-ной страницы публикаций с ключевым словом
 	AddPost(Post) error                           // создание новой публикации
 	UpdatePost(Post) error                        // обновление публикации
 	DeletePost(Post) error                        // удаление публикации по ID
 	Close()                                       // освобождение ресурса
-	//	DropDB() error              //удаление БД (при работе с монго)
 }

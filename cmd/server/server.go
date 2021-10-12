@@ -40,16 +40,6 @@ func main() {
 	p := rss.New()
 	srv.ds.Parser = p
 
-	// Создаём объект базы данных MongoDB.
-	// pwd := os.Getenv("Cloud0pass")
-	// connstr := fmt.Sprintf(
-	// 	"mongodb+srv://sup:%s@cloud0.wspoq.mongodb.net/newssrv?retryWrites=true&w=majority",
-	// 	pwd)
-	// db, err := mongodb.New("newssrv", connstr)
-	// if err != nil {
-	// 	log.Fatalf("mongo.New error: %s", err)
-	// }
-
 	//  Создаём объект базы данных PostgreSQL.
 	pwd := os.Getenv("pgpass")
 	connstr := "postgres://postgres:" + pwd + "@0.0.0.0/newssrv"

@@ -88,7 +88,7 @@ func (api *API) Router() *mux.Router {
 	return api.r
 }
 
-// Получение публикаций.
+//  получить страницу page последних новостей при количестве quantity на страницу
 func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 
 	ns := mux.Vars(r)["page"]
@@ -123,7 +123,8 @@ func (api *API) posts(w http.ResponseWriter, r *http.Request) {
 	w.Write(bytes)
 }
 
-// Получение публикаций по ключевому слову.
+// получить страницу page последних новостей при количестве quantity на страницу
+// содержащих keyword в заголовке
 func (api *API) filter(w http.ResponseWriter, r *http.Request) {
 
 	ns := mux.Vars(r)["page"]
@@ -159,7 +160,7 @@ func (api *API) filter(w http.ResponseWriter, r *http.Request) {
 	w.Write(bytes)
 }
 
-// Получение одной публикации.
+// получить детальную новость n
 func (api *API) detailed(w http.ResponseWriter, r *http.Request) {
 
 	ns := mux.Vars(r)["n"]

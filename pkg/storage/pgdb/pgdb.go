@@ -39,42 +39,6 @@ func (s *Store) Close() {
 	s.db.Close()
 }
 
-//Posts - получение всех публикаций
-func (s *Store) Posts() ([]storage.Post, error) {
-	rows, err := s.db.Query(context.Background(),
-		`SELECT 
-	posts.id, 
-	posts.title, 
-	posts.content, 
-	posts.pubdate, 
-	posts.pubtime,
-	posts.link
-	FROM posts;`)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var posts []storage.Post
-	for rows.Next() {
-		var p storage.Post
-		err = rows.Scan(
-			&p.ID,
-			&p.Title,
-			&p.Content,
-			&p.PubDate,
-			&p.PubTime,
-			&p.Link,
-		)
-		if err != nil {
-			return nil, err
-		}
-		posts = append(posts, p)
-	}
-
-	return posts, rows.Err()
-}
-
 //Post - получение одной публикации
 func (s *Store) Post(n int) (storage.Post, error) {
 	p := storage.Post{}
@@ -103,7 +67,6 @@ func (s *Store) Post(n int) (storage.Post, error) {
 	return p, err
 }
 
-//фильтр SELECT * FROM Universities WHERE UniversityName LIKE '%State%'
 //PostsN - получение n-ной страницы публикаций при q публикаций на страницу
 func (s *Store) PostsN(n, q int) ([]storage.Post, int, error) {
 	count := 0
@@ -150,7 +113,6 @@ func (s *Store) PostsN(n, q int) ([]storage.Post, int, error) {
 	return posts, count, rows.Err()
 }
 
-//фильтр SELECT * FROM Universities WHERE UniversityName LIKE '%State%'
 //Filter - получение n-ной страницы публикаций с ключевым словом key при q публикаций на страницу
 func (s *Store) Filter(n, q int, key string) ([]storage.Post, int, error) {
 	count := 0
