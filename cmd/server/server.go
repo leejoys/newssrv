@@ -73,6 +73,8 @@ func main() {
 
 	// Запускаем веб-сервер на порту 8081 на всех интерфейсах.
 	// Предаём серверу маршрутизатор запросов.
+	log.Println("HTTP server is started on localhost:8081")
+	defer log.Println("HTTP server has been stopped")
 	log.Fatal(http.ListenAndServe(":8081", srv.api.Router()))
 }
 
