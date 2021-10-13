@@ -15,6 +15,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const logfile = "./logfile.txt"
+
 // Программный интерфейс сервера GoNews
 type API struct {
 	db storage.Interface
@@ -48,7 +50,7 @@ func (api *API) endpoints() {
 //?request_id=327183798123
 func (api *API) idLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logfile, err := os.OpenFile("./logfile.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0664)
+		logfile, err := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0664)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("os.OpenFile error: %s", err.Error()), http.StatusInternalServerError)
 			return
