@@ -8,6 +8,3 @@ pubdate TEXT NOT NULL,
 pubtime BIGINT NOT NULL,
 link TEXT NOT NULL
 );
-
-INSERT INTO posts (id, title, content, pubdate, pubtime, link) 
-VALUES (0, 'Статья', 'Содержание статьи', 0, 0, 'google.com');
