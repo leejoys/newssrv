@@ -50,12 +50,12 @@ func (api *API) endpoints() {
 //?request_id=327183798123
 func (api *API) idLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logfile, err := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0664)
+		file, err := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0664)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("os.OpenFile error: %s", err.Error()), http.StatusInternalServerError)
 			return
 		}
-		defer logfile.Close()
+		defer file.Close()
 		id := r.URL.Query().Get("request_id")
 		if id == "" {
 			uid, err := uuid.NewV4()
@@ -65,8 +65,7 @@ func (api *API) idLogger(next http.Handler) http.Handler {
 			}
 			id = uid.String()
 		}
-		ctx := r.Context()
-		ctx = context.WithValue(ctx, "request_id", id)
+		ctx := context.WithValue(r.Context(), "request_id", id)
 		r = r.WithContext(ctx)
 		rec := httptest.NewRecorder()
 		next.ServeHTTP(rec, r)
@@ -76,11 +75,11 @@ func (api *API) idLogger(next http.Handler) http.Handler {
 		w.WriteHeader(rec.Code)
 		rec.Body.WriteTo(w)
 
-		fmt.Fprintf(logfile, "Request ID:%s\n", id)
-		fmt.Fprintf(logfile, "Time:%s\n", time.Now().Format(time.RFC1123))
-		fmt.Fprintf(logfile, "Remote IP address:%s\n", r.RemoteAddr)
-		fmt.Fprintf(logfile, "HTTP Status:%d\n", rec.Result().StatusCode)
-		fmt.Fprintln(logfile)
+		fmt.Fprintf(file, "Request ID:%s\n", id)
+		fmt.Fprintf(file, "Time:%s\n", time.Now().Format(time.RFC1123))
+		fmt.Fprintf(file, "Remote IP address:%s\n", r.RemoteAddr)
+		fmt.Fprintf(file, "HTTP Status:%d\n", rec.Result().StatusCode)
+		fmt.Fprintln(file)
 	})
 }
 
